@@ -5,7 +5,7 @@ cff-version: 1.2.0
 title: >-
   The effect of biodiversity on the spatial variability of
   grassland biomass
-message: 'Please cite this dataset and script as:'
+message: 'Please cite these datasets and script as:'
 type: dataset
 authors:
   - given-names: Pedro
