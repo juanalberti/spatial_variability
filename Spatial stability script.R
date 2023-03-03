@@ -679,8 +679,11 @@ model_pre_post<-psem(
   beta%~~%gama
 )
 Pre_Post_Data$year<-as.factor(Pre_Post_Data$year)
-(pmultigroup <- multigroup(model_pre_post, group = "year"))
-summary(model_pre_post)
+multigroup <- multigroup(model_pre_post, group = "year")
+#get the p values for the interactions with year 
+multigroup$anovaInts
+#get the coefficients for each group
+multigroup$group.coefs
 ########################################################################
 
 ##########################PLOTS################################################
@@ -1207,6 +1210,5 @@ se <- ggplot(logresponces, aes(x=variable2, y=LRR, ymin = inf, ymax=sup)) +
 Fig_S6<-se+ geom_hline(yintercept=0)
 
 
-#fitted to plot
 
 

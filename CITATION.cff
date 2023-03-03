@@ -1,0 +1,99 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: >-
+  The effect of biodiversity on the spatial variability of
+  grassland biomass (dataset and script)
+message: 'Please cite this dataset and script as:'
+type: dataset
+authors:
+  - given-names: Pedro
+    family-names: Daleo
+    email: pedo.daleo@gmail.com
+    orcid: 'https://orcid.org/0000-0001-9759-1203'
+    affiliation: >-
+      Instituto de Investigaciones Marinas y Costeras
+      (IIMyC), UNMDP – CONICET
+  - given-names: Juan
+    family-names: Alberti
+    email: jalberti@mdp.edu.ar
+    affiliation: >-
+      Instituto de Investigaciones Marinas y Costeras
+      (IIMyC), UNMDP – CONICET
+  - given-names: 'Enrique J. '
+    family-names: Chaneton
+  - given-names: 'Oscar '
+    family-names: Iribarne
+  - given-names: 'Pedro M. '
+    family-names: Tognetti
+  - given-names: 'Jonathan D. '
+    family-names: Bakker
+  - given-names: 'Elizabeth T. '
+    family-names: Borer
+  - given-names: 'Martín '
+    family-names: Bruschetti
+  - given-names: 'Andrew S. '
+    family-names: MacDougall
+  - given-names: 'Jesús '
+    family-names: Pascual
+  - given-names: 'Mahesh '
+    family-names: Sankaran
+  - given-names: 'Eric W. '
+    family-names: Seabloom
+  - given-names: 'Shaopeng '
+    family-names: Wang
+  - given-names: 'Sumanta '
+    family-names: Bagchi
+  - given-names: 'Lars A. '
+    family-names: Brudvig
+  - given-names: 'Jane A. '
+    family-names: Catford
+  - given-names: 'Chris R. '
+    family-names: Dickman
+  - given-names: 'Timothy L. '
+    family-names: Dickson
+  - given-names: 'Ian '
+    family-names: Donohue
+  - given-names: 'Nico '
+    family-names: Eisenhauer
+  - given-names: 'Daniel S. '
+    family-names: Gruner
+  - given-names: 'Sylvia '
+    family-names: Haider
+  - given-names: 'Anke '
+    family-names: Jentsch
+  - given-names: 'Johannes M. H. '
+    family-names: Knops
+  - given-names: 'Ylva '
+    family-names: Lekberg
+  - given-names: 'Rebecca L. '
+    family-names: McCulley
+  - given-names: 'Joslin L. '
+    family-names: Moore
+  - given-names: 'Brent '
+    family-names: Mortensen
+  - given-names: 'Timothy '
+    family-names: Ohlert
+  - given-names: 'Meelis '
+    family-names: Pärtel
+  - given-names: 'Pablo L. '
+    family-names: Peri
+  - given-names: 'Sally A. '
+    family-names: Power
+  - given-names: 'Anita C. '
+    family-names: Risch
+  - given-names: 'Camila '
+    family-names: Rocca
+  - given-names: 'Nicholas G. '
+    family-names: Smith
+  - given-names: 'Carly '
+    family-names: Stevens
+  - given-names: 'Riin '
+    family-names: Tamme
+  - given-names: 'G.F. (Ciska) '
+    family-names: Veen
+  - given-names: Peter A.
+    family-names: Wilfahrt
+  - given-names: Yann
+    family-names: Hautier
