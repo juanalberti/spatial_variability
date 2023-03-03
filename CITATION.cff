@@ -4,7 +4,7 @@
 cff-version: 1.2.0
 title: >-
   The effect of biodiversity on the spatial variability of
-  grassland biomass (dataset and script)
+  grassland biomass
 message: 'Please cite this dataset and script as:'
 type: dataset
 authors:
@@ -91,7 +91,7 @@ authors:
     family-names: Stevens
   - given-names: 'Riin '
     family-names: Tamme
-  - given-names: 'G.F. (Ciska) '
+  - given-names: 'G.F. '
     family-names: Veen
   - given-names: Peter A.
     family-names: Wilfahrt
