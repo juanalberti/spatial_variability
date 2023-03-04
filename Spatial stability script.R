@@ -35,13 +35,13 @@ library("varhandle")
 #in where soil conditions where measured (observational_data_soil.csv) and a version in where data for each site were sumarized (observational_data_site_climate.csv).
 
 Pre_Data<- read.csv("observational_data.csv", header=TRUE, sep=",", 
-                na.strings=c("NA", "NULL"), dec=".", strip.white=TRUE)
+                    na.strings=c("NA", "NULL"), dec=".", strip.white=TRUE)
 Pre_Data_site<- read.csv("observational_data_site_climate.csv", header=TRUE, sep=",", 
                          na.strings=c("NA", "NULL"), dec=".", strip.white=TRUE)
 Pre_Data_soil<- read.csv("observational_data_soil.csv", header=TRUE, sep=",", 
-                    na.strings=c("NA", "NULL"), dec=".", strip.white=TRUE)
+                         na.strings=c("NA", "NULL"), dec=".", strip.white=TRUE)
 Pre_Post_Data<- read.csv("increased heterogeneity.csv", header=TRUE, sep=",", 
-                     na.strings="NA", dec=".", strip.white=TRUE)
+                         na.strings="NA", dec=".", strip.white=TRUE)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #mixed-effect models to evaluate the relation between different levels of diversity and spatial variability####
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -225,9 +225,12 @@ intervals (lme2_beta_a)$fixed
 #type II regression####
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #Here we used data sumarized by site (Pre_Data_site) 
-type2<-lmodel2(log(variability) ~ richness, data=Pre_Data_site, nperm=999)
-type2_gama<-lmodel2(log(variability) ~ gama, data=Pre_Data_site, nperm=999)
-type2_beta<-lmodel2(log(variability) ~ mult_beta_pa, data=Pre_Data_site, nperm=999)
+type2<-lmodel2(log(variability) ~ richness, range.y =
+                 "interval", range.x = "relative", data=Pre_Data_site, nperm=999)
+type2_gama<-lmodel2(log(variability) ~ gama, range.y =
+                      "interval", range.x = "relative", data=Pre_Data_site, nperm=999)
+type2_beta<-lmodel2(log(variability) ~ mult_beta_pa, range.y =
+                      "interval", range.x = "relative",data=Pre_Data_site, nperm=999)
 #to get the reported statistics
 type2
 type2_gama
@@ -245,12 +248,12 @@ Pre_Data$covariation_log<-log(Pre_Data$covariation)
 
 #define individual models for response variables
 variability_model<-lme(fixed=variability_log~gama + mult_beta_pa + richness +covariation_log
-    + biomass_log, random= ~1|site, 
-    method = "REML", control=ctrl, data=Pre_Data)
+                       + biomass_log, random= ~1|site, 
+                       method = "REML", control=ctrl, data=Pre_Data)
 biomass_model<-lme(fixed=biomass_log~richness, random= ~1|site, 
-    method = "REML", control=ctrl, data=Pre_Data)
+                   method = "REML", control=ctrl, data=Pre_Data)
 covariation_model<-lme(fixed=covariation_log~richness + mult_beta_pa + gama, random= ~1|site, 
-    method = "REML", control=ctrl, data=Pre_Data)
+                       method = "REML", control=ctrl, data=Pre_Data)
 
 #initial model with bidirectional relations between levels of richness
 model_full_sem<-psem(variability_model,
@@ -316,15 +319,51 @@ coefs(final_model)
 #against these climatic variables, kept the residuals, and then modeled the relationship 
 #between different levels of diversity and the obtained residuals, using type II regression 
 ##########residuals after regresion against all environmental variables####
-xnam<-colnames(Pre_Data_site[3:25])
+xnam<-c("MAT_v2","MAP_v2","MAT_RANGE_v2","TEMP_VAR_v2","MAP_VAR_v2","TEMP_WET_Q_v2")
+xnam2<-c("MAT_v2*richness","MAP_v2*richness","MAT_RANGE_v2*richness","TEMP_VAR_v2*richness",
+         "MAP_VAR_v2*richness","TEMP_WET_Q_v2*richness")
+xnam2b<-c("MAT_v2*mult_beta_pa","MAP_v2*mult_beta_pa","MAT_RANGE_v2*mult_beta_pa","TEMP_VAR_v2*mult_beta_pa",
+          "MAP_VAR_v2*mult_beta_pa","TEMP_WET_Q_v2*mult_beta_pa")
+xnam2g<-c("MAT_v2*gama","MAP_v2*gama","MAT_RANGE_v2*gama","TEMP_VAR_v2*gama",
+          "MAP_VAR_v2*gama","TEMP_WET_Q_v2*gama")
+
 fmla_e <- as.formula(paste("log(variability) ~ ", paste(xnam, collapse= "+")))
 lm_full_e<-lm(fmla_e, data=Pre_Data_site)
-type2_env<-lmodel2(lm_full_e$residuals ~ richness, data=Pre_Data_site, nperm=999)
+type2_env<-lmodel2(lm_full_e$residuals ~ richness, range.y =
+                     "interval", range.x = "relative", data=Pre_Data_site, nperm=999)
 type2_env
-type2_envg<-lmodel2(lm_full_e$residuals ~ gama, data=Pre_Data_site, nperm=999)
+type2_envg<-lmodel2(lm_full_e$residuals ~ gama, range.y =
+                      "interval", range.x = "relative",data=Pre_Data_site, nperm=999)
 type2_envg
-type2_envb<-lmodel2(lm_full_e$residuals ~ mult_beta_pa, data=Pre_Data_site, nperm=999)
+type2_envb<-lmodel2(lm_full_e$residuals ~ mult_beta_pa, range.y =
+                      "interval", range.x = "relative",data=Pre_Data_site, nperm=999)
 type2_envb
+#alpha
+fmla2_e <- as.formula(paste("log(variability) ~ ", paste(xnam2, collapse= "+"),"+ richness"))
+full2_e<-lm(fmla2_e, data=Pre_Data_site)
+justr_e<-lm(log(variability) ~ richness, data=Pre_Data_site)
+options(na.action = "na.fail")
+dd <- dredge(full2_e)
+summary(get.models(dd, 1)[[1]])
+summary(get.models(dd, 2)[[1]])
+anova(get.models(dd, 1)[[1]], get.models(dd, 2)[[1]])
+#model 2 is the best
+anova(get.models(dd, 2)[[1]])
+#beta
+fmla2_eb <- as.formula(paste("log(variability) ~ ", paste(xnam2b, collapse= "+"),"+ mult_beta_pa"))
+full2_eb<-lm(fmla2_eb, data=Pre_Data_site)
+justr_eb<-lm(log(variability) ~ mult_beta_pa, data=Pre_Data_site)
+ddb <- dredge(full2_eb)
+summary(get.models(ddb, 1)[[1]])
+anova(get.models(ddb, 1)[[1]], lm(log(variability) ~ MAT_RANGE_v2*mult_beta_pa, data=Pre_Data_site))
+#gamma
+fmla2_eg <- as.formula(paste("log(variability) ~ ", paste(xnam2g, collapse= "+")))
+full2_eg<-lm(fmla2_eg, data=Pre_Data_site)
+justr_eg<-lm(log(variability) ~ gama, data=Pre_Data_site)
+ddg <- dredge(full2_eg)
+summary(get.models(ddg, 1)[[1]])
+anova(lm(log(variability) ~ MAP_v2*gama, data=Pre_Data_site))
+anova(get.models(ddg, 1)[[1]], lm(log(variability) ~ MAP_v2*gama, data=Pre_Data_site))
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #SEM adding variability in soil conditions#####
@@ -333,14 +372,14 @@ type2_envb
 
 #define initial individual models 
 variability_model_h<-lme(fixed=variability_log~gama + mult_beta_pa + richness +covariation_log
-    + biomass_log+cv_soil, random= ~1|site, 
-    method = "REML", control=ctrl, data=Pre_Data_soil)
+                         + biomass_log+cv_soil, random= ~1|site, 
+                         method = "REML", control=ctrl, data=Pre_Data_soil)
 biomass_model_h<-lme(fixed=biomass_log~richness, random= ~1|site, 
-    method = "REML", control=ctrl, data=Pre_Data_soil)
+                     method = "REML", control=ctrl, data=Pre_Data_soil)
 covariation_model_h<-lme(fixed=covariation_log~richness + mult_beta_pa + gama, random= ~1|site, 
-    method = "REML", control=ctrl, data=Pre_Data_soil)
+                         method = "REML", control=ctrl, data=Pre_Data_soil)
 beta_model_h<-lme(fixed=mult_beta_pa~cv_soil, random=~1|site, 
-    method = "REML", control=ctrl, data=Pre_Data_soil)
+                  method = "REML", control=ctrl, data=Pre_Data_soil)
 
 #initial model
 model_full_soil<-psem(variability_model_h,
@@ -362,7 +401,7 @@ model_1_soil<-psem(variability_model_h1,
                    richness%~~%gama,
                    mult_beta_pa%~~%richness,
                    mult_beta_pa%~~%gama
-                   )
+)
 summary(model_1_soil)# 67   134
 
 
@@ -482,12 +521,12 @@ lme2_b_y4=lme(fixed=log(variability)~beta, random= ~1|site,
 #pre heterogeneity:
 
 variability_preh<-lme(fixed=variability_log~gama + beta + richness +covariation_log
-    + biomass_log, random= ~1|site, 
-    method = "REML", control=ctrl, data=pre_h)
+                      + biomass_log, random= ~1|site, 
+                      method = "REML", control=ctrl, data=pre_h)
 biomass_preh<-lme(fixed=biomass_log~richness, random= ~1|site, 
-    method = "REML", control=ctrl, data=pre_h)
+                  method = "REML", control=ctrl, data=pre_h)
 covariation_preh<-lme(fixed=covariation_log~richness + beta + gama, random= ~1|site, 
-    method = "REML", control=ctrl, data=pre_h)
+                      method = "REML", control=ctrl, data=pre_h)
 
 model_full_sem_pre<-psem(variability_preh,
                          biomass_preh,
@@ -495,7 +534,7 @@ model_full_sem_pre<-psem(variability_preh,
                          richness%~~%gama,
                          beta%~~%richness,
                          beta%~~%gama
-                         )
+)
 
 # Get goodness-of-fit and AIC
 summary(model_full_sem_pre)
@@ -508,7 +547,7 @@ model_1_sem_pre<-psem(variability_preh1,
                       richness%~~%gama,
                       beta%~~%richness,
                       beta%~~%gama
-                      )
+)
 
 
 # Get goodness-of-fit and AIC
@@ -517,11 +556,11 @@ summary(model_1_sem_pre)
 #remove richness as predictor for biomass
 
 model_2_sem_pre<-psem(variability_preh1,
-                       covariation_preh,
-                       richness%~~%gama,
-                       beta%~~%richness,
-                       beta%~~%gama
-                      )
+                      covariation_preh,
+                      richness%~~%gama,
+                      beta%~~%richness,
+                      beta%~~%gama
+)
 
 # Get goodness-of-fit and AIC
 summary(model_2_sem_pre)
@@ -533,7 +572,7 @@ model_3_sem_pre<-psem(variability_preh1,
                       richness%~~%gama,
                       beta%~~%richness,
                       beta%~~%gama
-                      )
+)
 
 # Get goodness-of-fit and AIC
 summary(model_3_sem_pre)
@@ -545,7 +584,7 @@ model_4_sem_pre<-psem(variability_preh1,
                       richness%~~%gama,
                       beta%~~%richness,
                       beta%~~%gama
-                      )
+)
 
 # Get goodness-of-fit and AIC
 summary(model_4_sem_pre)
@@ -557,7 +596,7 @@ model_5_sem_pre<-psem(variability_preh2,
                       richness%~~%gama,
                       beta%~~%richness,
                       beta%~~%gama
-                      )
+)
 
 # Get goodness-of-fit and AIC
 summary(model_5_sem_pre)
@@ -567,7 +606,7 @@ model_6_sem_pre<-psem(variability_preh2,
                       covariation_preh2,
                       richness%~~%gama,
                       beta%~~%gama
-                      )
+)
 
 # Get goodness-of-fit and AIC
 summary(model_6_sem_pre)
@@ -587,12 +626,12 @@ coefs(model_6_sem_pre, pre_t, standardize = "scale")
 #post heterogeneity
 
 variability_posth<-lme(fixed=variability_log~gama + beta + richness +covariation_log
-                      + biomass_log, random= ~1|site, 
-                      method = "REML", control=ctrl, data=post_h)
+                       + biomass_log, random= ~1|site, 
+                       method = "REML", control=ctrl, data=post_h)
 biomass_posth<-lme(fixed=biomass_log~richness, random= ~1|site, 
-                  method = "REML", control=ctrl, data=post_h)
+                   method = "REML", control=ctrl, data=post_h)
 covariation_posth<-lme(fixed=covariation_log~richness + beta + gama, random= ~1|site, 
-                      method = "REML", control=ctrl, data=post_h)
+                       method = "REML", control=ctrl, data=post_h)
 
 model_full_sem_post<-psem(variability_posth,
                           biomass_posth,
@@ -600,7 +639,7 @@ model_full_sem_post<-psem(variability_posth,
                           richness%~~%gama,
                           beta%~~%richness,
                           beta%~~%gama
-                          )
+)
 
 # Get goodness-of-fit and AIC
 summary(model_full_sem_post)
@@ -612,7 +651,7 @@ model_1_sem_post<-psem(variability_posth,
                        richness%~~%gama,
                        beta%~~%richness,
                        beta%~~%gama
-                       )
+)
 # Get goodness-of-fit and AIC
 summary(model_1_sem_post)
 
@@ -623,7 +662,7 @@ model_2_sem_post<-psem(variability_posth1,
                        richness%~~%gama,
                        beta%~~%richness,
                        beta%~~%gama
-                       )
+)
 
 # Get goodness-of-fit and AIC
 summary(model_2_sem_post)
@@ -635,7 +674,7 @@ model_3_sem_post<-psem(variability_posth1,
                        richness%~~%gama,
                        beta%~~%richness,
                        beta%~~%gama
-                       )
+)
 
 # Get goodness-of-fit and AIC
 summary(model_3_sem_post)
@@ -647,7 +686,7 @@ model_4_sem_post<-psem(variability_posth1,
                        richness%~~%gama,
                        beta%~~%richness,
                        beta%~~%gama
-                       )
+)
 summary(model_4_sem_post)
 
 #remove beta<->richness
@@ -655,7 +694,7 @@ model_5_sem_post<-psem(variability_posth1,
                        covariation_posth2,
                        richness%~~%gama,
                        beta%~~%gama
-                       )
+)
 summary(model_5_sem_post)
 
 
@@ -897,7 +936,7 @@ Fig_4C<-ggplot(post_h, aes(beta, log(variability)))+
   geom_line(aes(y=F1_y4b, col=site), size=1)+
   geom_point(size=3, alpha=0.6, aes(colour = site)) +
   geom_point(size=3, alpha=0.3, aes(x=pre_h$beta, y=log(pre_h$variability), 
-                                             colour = site)) +
+                                    colour = site)) +
   theme_cowplot()+
   theme(legend.position = "none")+
   theme(plot.margin = unit(c(0.2,0.2,0.2,0), "cm"))+ 
@@ -1025,9 +1064,9 @@ Fig_S3E<-ggplot(to_plot, aes(a_beta, log(variability)))+
   scale_colour_discrete(drop=TRUE,
                         limits = levels(to_plot$site))
 
-  Fig_S3F<-ggplot(to_plot, aes(multi_beta, log(variability)))+
-    labs(x="beta diversity (multivariate, abundance-based)",
-         y="spatial variability (log scale)")+
+Fig_S3F<-ggplot(to_plot, aes(multi_beta, log(variability)))+
+  labs(x="beta diversity (multivariate, abundance-based)",
+       y="spatial variability (log scale)")+
   geom_line(aes(y=F0_mbab),col="lightgrey", size=2) + 
   geom_line(aes(y=F1_mbab, col=site), alpha= 0.5, size=0.75)+
   geom_point(size=3, alpha=0.5, aes(colour = site)) +
@@ -1038,19 +1077,19 @@ Fig_S3E<-ggplot(to_plot, aes(a_beta, log(variability)))+
   scale_colour_discrete(drop=TRUE,
                         limits = levels(to_plot$site))
 
-  Fig_S3G<-ggplot(to_plot, aes(simpson_g, log(variability)))+
-    labs(x="gamma diversity (simpson)",
-         y="spatial variability (log scale)")+
-    geom_line(aes(y=F0_simg),col="lightgrey", size=2) + 
-    geom_line(aes(y=F1_simg, col=site), alpha= 0.5, size=0.75)+
-    geom_point(size=3, alpha=0.5, aes(colour = site)) +
-    theme_cowplot()+
-    theme(legend.position = "none")+
-    theme(axis.title.x = element_text(size=20), axis.title.y = element_text(size=20))+
-    theme(plot.margin = unit(c(0,0,0,0), "cm"))+ 
-    scale_colour_discrete(drop=TRUE,
-                          limits = levels(to_plot$site))
-  Fig_S3H<-ggplot(to_plot, aes(shannon_g, log(variability)))+
+Fig_S3G<-ggplot(to_plot, aes(simpson_g, log(variability)))+
+  labs(x="gamma diversity (simpson)",
+       y="spatial variability (log scale)")+
+  geom_line(aes(y=F0_simg),col="lightgrey", size=2) + 
+  geom_line(aes(y=F1_simg, col=site), alpha= 0.5, size=0.75)+
+  geom_point(size=3, alpha=0.5, aes(colour = site)) +
+  theme_cowplot()+
+  theme(legend.position = "none")+
+  theme(axis.title.x = element_text(size=20), axis.title.y = element_text(size=20))+
+  theme(plot.margin = unit(c(0,0,0,0), "cm"))+ 
+  scale_colour_discrete(drop=TRUE,
+                        limits = levels(to_plot$site))
+Fig_S3H<-ggplot(to_plot, aes(shannon_g, log(variability)))+
   labs(x="gamma diversity (shannon)",
        y="spatial variability (log scale)")+
   geom_line(aes(y=F0_shang),col="lightgrey", size=2) + 
@@ -1087,7 +1126,7 @@ Fig_S4B<-ggplot(to_plot, aes(gama, log(live_mass)))+
   theme(plot.margin = unit(c(0.5,0.5,0.5,0), "cm"))+ 
   scale_colour_discrete(drop=TRUE,
                         limits = levels(to_plot$site))
-  
+
 Fig_S4C<-ggplot(to_plot, aes(mult_beta_pa, log(live_mass)))+
   labs(x="beta diversity", y="spatial mean (log scale)")+
   geom_line(aes(y=F0_meb),col="lightgrey", size=2.5)+ 
