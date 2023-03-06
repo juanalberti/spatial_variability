@@ -1,7 +1,7 @@
 # spatial_variability
 ## Data and R script for "Environmental heterogeneity modulates the effect of biodiversity on the spatial variability of grassland biomass"
 
-[![DOI](https://zenodo.org/badge/567848101.svg)](https://zenodo.org/badge/latestdoi/567848101)
+[![DOI](https://zenodo.org/badge/567848101.svg)](https://doi.org/10.5281/zenodo.7692198)
 
 In this repository you will find the data files, and the script to analyze the effect of diversity on spatial variability of primary production.
 While there is strong evidence of diversity effects on temporal variability of productivity, whether this mechanism extends to variability across space remains elusive. The work uses data from Nutrien Network (www.nutnet.org) to determine the relationship between plant diversity and spatial variability of productivity in 83 grasslands worldwide, and quantify the effect of experimentally increased spatial heterogeneity in environmental conditions on this relationship. 
